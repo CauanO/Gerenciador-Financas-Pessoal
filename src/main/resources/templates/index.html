@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Portal Financeiro</title>
+    <link rel="stylesheet" href="/css/style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="container">
+        <header>
+            <h1>Portal de Finanças</h1>
+			<a href="/logout"><button id="logout">Sair</button></a>
+        </header>
+        <main>
+            <section class="summary">
+                <div class="card">
+                    <h3>Saldo Atual</h3>
+                    <p id="balance">R$ 0,00</p>
+                </div>
+                <div class="card">
+                    <h3>Receitas</h3>
+                    <p id="income">R$ 0,00</p>
+                </div>
+                <div class="card">
+                    <h3>Despesas</h3>
+                    <p id="expenses">R$ 0,00</p>
+                </div>
+            </section>
+            <section class="chart">
+                <canvas id="financeChart"></canvas>
+            </section>
+            <section class="transaction-form">
+                <h3>Nova Transação</h3>
+                <input type="text" id="desc" placeholder="Descrição">
+                <input type="number" id="amount" placeholder="Valor">
+                <select id="type">
+                    <option value="income">Receita</option>
+                    <option value="expense">Despesa</option>
+                </select>
+                <button onclick="addTransaction()">Adicionar</button>
+            </section>
+            <section class="transaction-list">
+                <h3>Transações Recentes</h3>
+                <ul id="transactions"></ul>
+            </section>
+        </main>
+    </div>
+</body>
