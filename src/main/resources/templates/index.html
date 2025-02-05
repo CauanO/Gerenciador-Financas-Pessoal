@@ -1,50 +1,204 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Portal Financeiro</title>
-    <link rel="stylesheet" href="/css/style.css">
+    <link rel="stylesheet" href="/css/style.css" />
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-</head>
-<body>
+    <style>
+      body {
+        font-family: Arial, sans-serif;
+        margin: 0;
+        padding: 0;
+        background-color: #f4f4f4;
+      }
+      .container {
+        max-width: 800px;
+        margin: 20px auto;
+        padding: 20px;
+        background: white;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+        border-radius: 8px;
+      }
+      header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        background: #007bff;
+        color: white;
+        padding: 10px;
+        border-radius: 8px 8px 0 0;
+      }
+      .summary {
+        display: flex;
+        justify-content: space-between;
+        margin: 20px 0;
+      }
+      .card {
+        background: #f8f9fa;
+        padding: 15px;
+        border-radius: 5px;
+        text-align: center;
+        flex: 1;
+        margin: 0 10px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+      .chart {
+        margin: 20px 0;
+      }
+      .transaction-form {
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+      }
+      .transaction-form input,
+      select,
+      button {
+        padding: 10px;
+        border: 1px solid #ccc;
+        border-radius: 5px;
+      }
+      .transaction-form button {
+        background: #28a745;
+        color: white;
+        border: none;
+        cursor: pointer;
+      }
+      .transaction-form button:hover {
+        background: #218838;
+      }
+      .transaction-list ul {
+        list-style: none;
+        padding: 0;
+      }
+      .transaction-list li {
+        padding: 10px;
+        background: #fff;
+        margin: 5px 0;
+        border-radius: 5px;
+        box-shadow: 0 0 5px rgba(0, 0, 0, 0.1);
+      }
+    </style>
+  </head>
+  <body>
+    <header>
+      <h1>Portal de Finanças</h1>
+      <a href="/logout"><button id="logout">Sair</button></a>
+    </header>
     <div class="container">
-        <header>
-            <h1>Portal de Finanças</h1>
-			<a href="/logout"><button id="logout">Sair</button></a>
-        </header>
-        <main>
-            <section class="summary">
-                <div class="card">
-                    <h3>Saldo Atual</h3>
-                    <p id="balance">R$ 0,00</p>
-                </div>
-                <div class="card">
-                    <h3>Receitas</h3>
-                    <p id="income">R$ 0,00</p>
-                </div>
-                <div class="card">
-                    <h3>Despesas</h3>
-                    <p id="expenses">R$ 0,00</p>
-                </div>
-            </section>
-            <section class="chart">
-                <canvas id="financeChart"></canvas>
-            </section>
-            <section class="transaction-form">
-                <h3>Nova Transação</h3>
-                <input type="text" id="desc" placeholder="Descrição">
-                <input type="number" id="amount" placeholder="Valor">
-                <select id="type">
-                    <option value="income">Receita</option>
-                    <option value="expense">Despesa</option>
-                </select>
-                <button onclick="addTransaction()">Adicionar</button>
-            </section>
-            <section class="transaction-list">
-                <h3>Transações Recentes</h3>
-                <ul id="transactions"></ul>
-            </section>
-        </main>
+      <main>
+        <section class="summary">
+          <div class="card">
+            <h3>Saldo Atual</h3>
+            <p id="balance">R$ 0,00</p>
+          </div>
+          <div class="card">
+            <h3>Receitas</h3>
+            <p id="income">R$ 0,00</p>
+          </div>
+          <div class="card">
+            <h3>Despesas</h3>
+            <p id="expenses">R$ 0,00</p>
+          </div>
+        </section>
+        <section class="chart">
+          <canvas id="financeChart"></canvas>
+        </section>
+
+        <section class="transaction-form">
+          <h3>Atualize o Saldo</h3>
+          <input
+            type="number"
+            id="initialBalance"
+            placeholder="Defina o saldo inicial"
+            oninput="updateBalance()"
+          />
+          <button onclick="addSaldo()">Adicionar</button>
+        </section>
+
+        <section class="transaction-form">
+          <h3>Nova Transação</h3>
+          <input type="text" id="desc" placeholder="Descrição" />
+          <input type="number" id="amount" placeholder="Valor" />
+          <select id="type">
+            <option value="income">Receita</option>
+            <option value="expense">Despesa</option>
+          </select>
+          <button onclick="addTransaction()">Adicionar</button>
+        </section>
+        <section class="transaction-list">
+          <h3>Transações Recentes</h3>
+          <ul id="transactions"></ul>
+        </section>
+      </main>
     </div>
-</body>
+    <script>
+      function addSaldo() {
+        const amount = parseFloat(
+          document.getElementById("initialBalance").value
+        );
+
+        document.getElementById("balance").innerText = `R$ ${balance.toFixed(
+          2
+        )}`;
+      }
+
+      let balance = 0,
+        income = 0,
+        expenses = 0;
+      const transactions = [];
+
+      function updateBalance() {
+        balance =
+          parseFloat(document.getElementById("initialBalance").value) || 0;
+        document.getElementById("balance").innerText = `R$ ${balance.toFixed(
+          2
+        )}`;
+      }
+
+      function addTransaction() {
+        const desc = document.getElementById("desc").value;
+        const amount = parseFloat(document.getElementById("amount").value);
+        const type = document.getElementById("type").value;
+
+        if (!desc || isNaN(amount) || amount <= 0) {
+          alert("Preencha todos os campos corretamente!");
+          return;
+        }
+
+        transactions.push({ desc, amount, type });
+
+        if (type === "income") {
+          income += amount;
+          balance += amount;
+        } else {
+          expenses += amount;
+          balance -= amount;
+        }
+
+        document.getElementById("balance").innerText = `R$ ${balance.toFixed(
+          2
+        )}`;
+        document.getElementById("income").innerText = `R$ ${income.toFixed(2)}`;
+        document.getElementById("expenses").innerText = `R$ ${expenses.toFixed(
+          2
+        )}`;
+
+        updateTransactionList();
+      }
+
+      function updateTransactionList() {
+        const list = document.getElementById("transactions");
+        list.innerHTML = "";
+        transactions.forEach((tr) => {
+          const li = document.createElement("li");
+          li.innerText = `${tr.desc} - R$ ${tr.amount.toFixed(2)} (${
+            tr.type === "income" ? "Receita" : "Despesa"
+          })`;
+          list.appendChild(li);
+        });
+      }
+    </script>
+  </body>
+</html>
